@@ -1,3 +1,4 @@
+<!-- index.html (FULL - copy/paste) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,66 +6,66 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Educational Phone Location Tracker</title>
 <link rel="stylesheet" href="styles/style.css">
-
-
-
 </head>
 
 <body>
 <div class="app-container">
-<header>
-  <h1>Phone Location Tracker</h1>
-  <p>Educational Tools Only</p>
-</header>
+  <header>
+    <h1>Phone Location Tracker</h1>
+    <p>Educational Tools Only</p>
+  </header>
 
-<div class="content">
-  <div style="display:flex;gap:16px;justify-content:space-between;align-items:center">
-    <div class="map-rotator">
-      <div class="map">
-        <div class="pin-pulse"></div>
-        <div class="map-pin"></div>
-        <div class="map-label">Maiduguri<br>Borno State<br>Baga Road Market</div>
+  <div class="content">
+    <div style="display:flex;gap:16px;justify-content:space-between;align-items:center">
+      <div class="map-rotator">
+        <div class="map">
+          <div class="pin-pulse"></div>
+          <div class="map-pin"></div>
+
+          <!-- ✅ HIDDEN FIRST, SHOWS ONLY AFTER VALID IMEI + CLICK TRACK -->
+          <div class="map-label" id="mapLabel">Maiduguri<br>Borno State<br>Baga Road Market</div>
+        </div>
+      </div>
+
+      <div class="phone-mockup">
+        <div class="phone-screen">
+          <div class="phone-status">
+            <div class="signal-bars"><span></span><span></span><span></span><span></span></div>
+            <div>4G</div>
+            <div id="phoneTime">--:--</div>
+          </div>
+
+          <div class="device-info">
+            <div class="device-name">Galaxy A04e</div>
+            <div class="device-brand">SAMSUNG / SM-A042F</div>
+
+            <div class="device-row"><span>IMEI</span><strong>35508837</strong></div>
+            <div class="device-row"><span>TAC</span><strong>749546</strong></div>
+            <div class="device-row"><span>SNR</span><strong>6</strong></div>
+
+            <button class="check-btn" type="button">CHECK NOW</button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="phone-mockup">
-      <div class="phone-screen">
-        <div class="phone-status">
-          <div class="signal-bars"><span></span><span></span><span></span><span></span></div>
-          <div>4G</div>
-          <div id="phoneTime">--:--</div>
-        </div>
+    <div class="form-group">
+      <label for="imei">Target IMEI (Achiver)</label>
+      <input id="imei" placeholder="Enter IMEI" inputmode="numeric" autocomplete="off" />
+      <small id="imeiError" aria-live="polite"></small>
+    </div>
 
-        <div class="device-info">
-          <div class="device-name">Galaxy A04e</div>
-          <div class="device-brand">SAMSUNG / SM-A042F</div>
+    <button class="track-btn" type="button" onclick="startTracking()">Track Target Location</button>
 
-          <div class="device-row"><span>IMEI</span><strong>35508837</strong></div>
-          <div class="device-row"><span>TAC</span><strong>749546</strong></div>
-          <div class="device-row"><span>SNR</span><strong>6</strong></div>
-
-          <button class="check-btn">CHECK NOW</button>
-        </div>
-      </div>
+    <div id="statusBox" class="status-box">
+      <strong>Status</strong><br>
+      <span id="statusText">Waiting for input...</span>
     </div>
   </div>
 
-  <div class="form-group">
-    <label>Target IMEI (Achiver)</label>
-    <input id="imei" placeholder="Enter IMEI">
-  </div>
-
-  <button class="track-btn" onclick="startTracking()">Track Target Location</button>
-
-  <div id="statusBox" class="status-box">
-    <strong>Status</strong><br>
-    <span id="statusText">Waiting for input...</span>
-  </div>
-</div>
-
-<footer>
-  <strong>Educational Purpose Only</strong> •real tracking
-</footer>
+  <footer>
+    <strong>Educational Purpose Only</strong> •real tracking
+  </footer>
 </div>
 
 <script>
@@ -87,9 +88,77 @@ function updateNigeriaTime() {
 
   timeElement.textContent = `${hours}:${minutes}`;
 }
-
 updateNigeriaTime();
 setInterval(updateNigeriaTime, 1000);
+
+/* =========================
+   ✅ IMEI VALIDATION (ONLY 2 ALLOWED)
+   ========================= */
+const allowedIMEIs = new Set([
+  "355088377495466",
+  "355399272537777"
+]);
+
+const imeiInput = document.getElementById("imei");
+const imeiError = document.getElementById("imeiError");
+const mapLabel = document.getElementById("mapLabel");
+
+function hideMapLabel(){
+  mapLabel.classList.remove("show");
+}
+
+function showMapLabel(){
+  mapLabel.classList.add("show");
+}
+
+function setIMEIError(message) {
+  imeiInput.classList.remove("is-valid", "is-invalid");
+
+  if (!message) {
+    imeiError.style.display = "none";
+    imeiError.textContent = "";
+    return;
+  }
+
+  imeiError.style.display = "block";
+  imeiError.textContent = message;
+  imeiInput.classList.add("is-invalid");
+}
+
+function setIMEIValid() {
+  imeiError.style.display = "none";
+  imeiError.textContent = "";
+  imeiInput.classList.remove("is-invalid");
+  imeiInput.classList.add("is-valid");
+}
+
+function isValidIMEI(value) {
+  return allowedIMEIs.has(value);
+}
+
+// Hide label on load
+hideMapLabel();
+
+// Only digits; validate once user reaches 15 digits
+imeiInput.addEventListener("input", () => {
+  imeiInput.value = imeiInput.value.replace(/\D/g, "");
+  const v = imeiInput.value.trim();
+
+  // If they start editing, hide the label again until they click Track with valid IMEI
+  hideMapLabel();
+
+  if (v === "") {
+    setIMEIError("");
+    return;
+  }
+
+  if (v.length >= 15) {
+    if (isValidIMEI(v)) setIMEIValid();
+    else setIMEIError("Invalid IMEI Detected");
+  } else {
+    setIMEIError("");
+  }
+});
 
 /* =========================
    EDUCATIONAL SIMULATION SCRIPT
@@ -110,35 +179,50 @@ const locations = [
   "Post Office Area"
 ];
 
-let step=0,interval,maxScans=10;
+let step = 0, interval, maxScans = 10;
 
-function startTracking(){
-  const imei=document.getElementById("imei").value.trim();
-  const box=document.getElementById("statusBox");
-  const text=document.getElementById("statusText");
+function startTracking() {
+  const imei = document.getElementById("imei").value.trim();
+  const box = document.getElementById("statusBox");
+  const text = document.getElementById("statusText");
 
-  if(!imei){
-    box.className="status-box error";
-    text.innerHTML="Please enter a IMEI.";
+  if (!imei) {
+    hideMapLabel();
+    setIMEIError("Please enter an IMEI.");
+    box.className = "status-box error";
+    text.innerHTML = "Please enter a IMEI.";
     return;
   }
 
-  step=0;
-  box.className="status-box";
-  text.innerHTML="Initializing scan...";
+  // ✅ Block anything except the 2 allowed IMEIs
+  if (!isValidIMEI(imei)) {
+    hideMapLabel();
+    setIMEIError("Invalid IMEI Detected");
+    box.className = "status-box error";
+    text.innerHTML = "Invalid IMEI Detected";
+    return;
+  }
+
+  // ✅ Valid IMEI + click = show label inside circle
+  setIMEIValid();
+  showMapLabel();
+
+  step = 0;
+  box.className = "status-box";
+  text.innerHTML = "Initializing scan...";
   clearInterval(interval);
 
-  interval=setInterval(()=>{
+  interval = setInterval(() => {
     step++;
-    if(step<=maxScans){
-      const loc=locations[Math.floor(Math.random()*locations.length)];
-      text.innerHTML=`Scanning network (${step}/${maxScans})...<br><strong>${loc}</strong>`;
-    }else{
+    if (step <= maxScans) {
+      const loc = locations[Math.floor(Math.random() * locations.length)];
+      text.innerHTML = `Scanning network (${step}/${maxScans})...<br><strong>${loc}</strong>`;
+    } else {
       clearInterval(interval);
-      box.className="status-box error";
-      text.innerHTML="<strong>Target Captured</strong><br>Bulunkutu Ward, IBRAHIM & SADIQ TECH phones repairs (Last Seen).";
+      box.className = "status-box error";
+      text.innerHTML = "<strong>Target Captured</strong><br>Bulunkutu Ward, IBRAHIM & SADIQ TECH phones repairs (Last Seen).";
     }
-  },1200);
+  }, 1200);
 }
 </script>
 </body>

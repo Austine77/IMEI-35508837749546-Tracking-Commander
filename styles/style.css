@@ -1,3 +1,4 @@
+/* styles/style.css (FULL - copy/paste) */
 :root{
   --primary:#0a2f24;
   --secondary:#0fb9b1;
@@ -250,4 +251,35 @@ footer{
   font-size:.65rem;
   text-align:center;
   color:#bbb;
+}
+
+/* ✅ IMEI VALIDATION (keeps same design, only adds error styling) */
+#imeiError{
+  display:none;
+  margin-top:6px;
+  font-size:.72rem;
+  font-weight:700;
+  color:var(--danger);
+}
+
+input.is-invalid{
+  border:2px solid var(--danger);
+  box-shadow:0 0 0 4px rgba(255,59,48,.12);
+}
+
+input.is-valid{
+  border:2px solid var(--success);
+  box-shadow:0 0 0 4px rgba(52,199,89,.12);
+}
+
+/* ✅ Map label hidden first, shown only after valid IMEI + click Track */
+#mapLabel{
+  opacity:0;
+  transform:scale(.6);
+  transition:opacity .6s ease, transform .6s ease;
+}
+
+#mapLabel.show{
+  opacity:1;
+  transform:scale(1);
 }
